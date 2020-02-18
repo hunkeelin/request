@@ -2,7 +2,7 @@
 
 ## Motivations
 
-This is a practice library to build request for a bank. The library is suppose to be minimalistic to avoid any type of bugs and unexpected behavior. 
+This is a practice library to build request. The library is suppose to be minimalistic to avoid any type of bugs and unexpected behavior. 
 
 ## Golang version
 
