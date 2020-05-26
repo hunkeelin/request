@@ -44,6 +44,12 @@ func (r *RequestBuilder) SetURL(b string) *RequestBuilder {
 	return r
 }
 
+// SetCookie
+func (r *RequestBuilder) SetCookie(b http.CookieJar) *RequestBuilder {
+	r.RequestInput.Client.Jar = b
+	return r
+}
+
 // SetBodyBytes set the body in terms of bytes
 func (r *RequestBuilder) SetBodyBytes(b []byte) *RequestBuilder {
 	r.RequestInput.BodyBytes = b
