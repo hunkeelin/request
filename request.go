@@ -45,25 +45,25 @@ func (r *RequestBuilder) SetURL(b string) *RequestBuilder {
 	return r
 }
 
-// AddCert
+// AddCert adds client cert
 func (r *RequestBuilder) AddCert(b []byte) *RequestBuilder {
 	r.certs = append(r.certs, b)
 	return r
 }
 
-// AddKey
+// AddKey adds the client key
 func (r *RequestBuilder) AddKey(b []byte) *RequestBuilder {
 	r.keys = append(r.keys, b)
 	return r
 }
 
-// AddTrust
+// AddTrust adds CA
 func (r *RequestBuilder) AddTrust(b []byte) *RequestBuilder {
 	r.trusts = append(r.trusts, b)
 	return r
 }
 
-// SetCookie
+// SetCookie sets the cookie
 func (r *RequestBuilder) SetCookie(b http.CookieJar) *RequestBuilder {
 	r.RequestInput.Client.Jar = b
 	return r
