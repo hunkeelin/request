@@ -1,20 +1,25 @@
 package request
 
 import (
+	"crypto/tls"
 	"net/http"
 )
 
 // RequestInput is request Input.
 type RequestInput struct {
-	URL        *string
-	Headers    map[string]string
-	RawHeaders http.Header
-	Method     *string
-	TimeOut    int
-	NoVerify   bool
-	BodyBytes  []byte
-	Json       *interface{}
-	Client     *http.Client
+	URL        *string           // URL
+	Headers    map[string]string //Headers
+	RawHeaders http.Header       //RawHeaders
+	Method     *string           // Method
+	TimeOut    int               // TimeOut
+	NoVerify   bool              // NoVerify
+	BodyBytes  []byte            // BodyBytes
+	Json       *interface{}      // Json
+	Client     *http.Client      // Client
+	TlsConfig  tls.Config        // TlsConfig
+	certs      [][]byte
+	keys       [][]byte
+	trusts     [][]byte
 }
 
 // RequestBuilder is the request builder struct for method chaining

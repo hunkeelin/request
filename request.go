@@ -3,6 +3,7 @@ package request
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -41,6 +42,24 @@ func NewWithClient(c *http.Client) RequestBuilder {
 // SetURL sets the url
 func (r *RequestBuilder) SetURL(b string) *RequestBuilder {
 	r.RequestInput.URL = &b
+	return r
+}
+
+// AddCert
+func (r *RequestBuilder) AddCert(b []byte) *RequestBuilder {
+	r.certs = append(r.certs, b)
+	return r
+}
+
+// AddKey
+func (r *RequestBuilder) AddKey(b []byte) *RequestBuilder {
+	r.keys = append(r.keys, b)
+	return r
+}
+
+// AddTrust
+func (r *RequestBuilder) AddTrust(b []byte) *RequestBuilder {
+	r.trusts = append(r.trusts, b)
 	return r
 }
 
@@ -104,9 +123,11 @@ func (r *RequestBuilder) Do() (*http.Response, error) {
 		h     *http.Response
 		ebody *bytes.Reader
 	)
-	tlsConfig := &tls.Config{}
-	tlsConfig.InsecureSkipVerify = r.RequestInput.NoVerify
-	err := r._check()
+	tlsConfig, err := r.getTlsConfig()
+	if err != nil {
+		return h, err
+	}
+	err = r._check()
 	if err != nil {
 		return h, err
 	}
@@ -167,4 +188,33 @@ func (r *RequestBuilder) _check() error {
 		return fmt.Errorf("url not valid")
 	}
 	return nil
+}
+func (r *RequestBuilder) getTlsConfig() (*tls.Config, error) {
+	// Mtls request
+	if len(r.certs) != len(r.keys) {
+		return &tls.Config{}, fmt.Errorf("number of certs and keys are not the same")
+	}
+	var certList []tls.Certificate
+	if len(r.certs) != 0 && len(r.keys) != 0 && len(r.trusts) != 0 {
+		for i := 0; i < len(r.certs); i++ {
+			cert, err := tls.X509KeyPair(r.certs[i], r.keys[i])
+			if err != nil {
+				return &tls.Config{}, err
+			}
+			certList = append(certList, cert)
+		}
+	}
+	toReturn := &tls.Config{
+		InsecureSkipVerify: r.RequestInput.NoVerify,
+		Certificates:       certList,
+	}
+	if len(r.trusts) != 0 {
+		clientCertPool := x509.NewCertPool()
+		for _, trust := range r.trusts {
+			clientCertPool.AppendCertsFromPEM(trust)
+		}
+		toReturn.RootCAs = clientCertPool
+	}
+	return toReturn, nil
+
 }
